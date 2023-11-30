@@ -1,6 +1,7 @@
 name: Rust
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "master" ]
   pull_request:
@@ -16,8 +17,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Cache Cargo dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo
+          target
+        key: ${{ runner.os }}-rust-${{ hashFiles('**/*.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-rust-
+
+    - name: Setup Rust
+      uses: actions/setup-rust@v1
     - name: Build
       run: |
+        sudo apt-get install fonts-wqy-microhei
+        fc-list :lang=zh
         git clone https://github.com/sunface/rust-course.git book
         pip3 install mdbook-pdf-outline
         cd book
